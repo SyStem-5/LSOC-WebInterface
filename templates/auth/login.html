@@ -1,0 +1,40 @@
+{% extends 'auth/login_base.html' %}
+
+{% block content %}
+
+<center>
+    <div class="card" style="max-width: 250px;">
+        <center>
+            <h2 style="color:black;">{{ title }}</h2>
+        </center>
+        <form action="." method="POST" class="form-horizontal">
+            {% csrf_token %}
+            <!--<h4>Use a local account to log in.</h4>-->
+            <div class="form-group" style="margin-left: 15px; margin-right: 15px;">
+                <label for="id_username" class=" control-label"></label>
+                {{ form.username }}
+            </div>
+            <div class="form-group" style="margin-left: 15px; margin-right: 15px;">
+                <label for="id_password" class=" control-label"></label>
+                {{ form.password }}
+            </div>
+            <div class="form-group" style="margin-left: 15px; margin-right: 15px;">
+                <input type="hidden" name="next" value="/" />
+                <input type="submit" value="Log in" class="btn btn-primary btn-block" />
+            </div>
+            {% if form.errors %}
+            <p class="validation-summary-errors" style="color: red">Wrong Username or Password</p>
+            {% endif %}
+        </form>
+    </div>
+</center>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{#% load staticfiles %#}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.18.0/jquery.validate.min.js"></script>
+
+{% endblock %}

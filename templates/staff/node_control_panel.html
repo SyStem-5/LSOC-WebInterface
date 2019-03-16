@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'assets/css/bootstrap-sortable/bootstrap-sortable.css' %}">
+<script src="{% static 'assets/js/bootstrap-sortable/bootstrap-sortable.js' %}"></script>
+<link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+<script src="{% static 'assets/js/bootstrap-notify.min.js' %}"></script>
+
+<style>
+    .dot {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+</style>
+
+<center>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <h2>Node Control Panel</h2>
+        </div>
+    </div>
+</center>
+
+<hr>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="table-responsive">
+
+                <table id="mytable" class="table table-bordered table-striped sortable">
+
+                    <thead class="thead-light">
+                        <th data-defaultsort="disabled" class="text-center">Online</th>
+                        <th data-defaultsort="AZ">Node Name</th>
+                        <th data-defaultsort="disabled">Identifier</th>
+                        <th data-defaultsort="AZ">Category</th>
+                        <th data-defaultsort="disabled">Elements</th>
+                        <th data-defaultsort="disabled"></th>
+                        <th data-defaultsort="disabled"><button id="refresh_nodes_list" class="btn btn-primary fas fa-sync-alt" data-toggle="tooltip" data-placement="top" title="Refresh List"></button></th>
+                    </thead>
+                    <tbody id="table_body" class="table-hover">
+                    </tbody>
+
+                </table>
+
+                <div class="clearfix"></div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    node_element_list = {}
+
+    refresh_nodes_list(false);
+
+    const socket = new WebSocket(
+        'ws://' + window.location.host +
+        '/superuser');
+
+    socket.addEventListener('open', function (event) {
+        //socket.send('Connected to superuser WS.');
+        console.log('Connected to superuser WS.');
+    });
+    socket.addEventListener('message', function (event) {
+        var payload = JSON.parse((event.data).replace(/[']/g,'"'));
+        
+        if(payload.command == "NodeState") {
+            set_node_state_indicator(payload.node_id, payload.state == "true" ? true : false);
+        }
+    });
+    socket.addEventListener('close', function(event) {
+        if(!event.wasClean)
+            console.log("WebSocket connection closed unexpectedly. Reason: ", event.reason);
+    })
+
+    function set_node_state_indicator(identifier, state) {
+        var id = '#state_'+identifier;
+        if(state)
+            $(id).attr('style','background-color: green;');
+        else
+            $(id).attr('style','background-color: red;');
+    }
+
+    $('#refresh_nodes_list').on('click', function () {
+        refresh_nodes_list();
+    })
+
+    function refresh_nodes_list(show_notif = true) {
+        $.getJSON("{% url 'get_node_element_list' %}")
+            .done(function (json) {
+                //console.log("Node list Data: " + json.data);
+
+                node_element_list = json.data;
+                if (show_notif)
+                    notification("", "Node list refreshed.", "success");
+
+                populateList(show_notif);
+            })
+            .fail(function (jqxhr, textStatus, error) {
+                console.log(error);
+                notification("Error", "Could not refresh nodes list.", "danger");
+            }
+        );
+    }
+
+    function populateList(show_notif=true) {
+        var tableBody = document.getElementById("table_body");
+
+        tableBody.innerHTML = "";
+
+        if(node_element_list == null || node_element_list.length == 0 && show_notif) {
+            notification("", "No registered nodes found.");
+            return;
+        }
+
+        node_element_list.forEach(node => {
+            var item = document.createElement('tr');
+
+            /*<td class="text-center">
+                <span class="dot" {% if node.state %}style="background-color: green;"{%else%}style="background-color: red;" {%endif%}></span>
+            </td>*/
+            var item_cl1 = document.createElement('td');
+                item_cl1.setAttribute("class", "text-center");
+                var span = document.createElement('span');
+                    span.setAttribute("id", "state_"+node.identifier);
+                    span.setAttribute("class", "dot");
+                if(node.state)
+                    span.setAttribute("style", "background-color: green;");
+                else
+                    span.setAttribute("style", "background-color: red;");
+                item_cl1.append(span);
+            item.append(item_cl1);
+
+            var item_cl2 = document.createElement('td');
+                item_cl2.innerText = node.name;
+            item.append(item_cl2);
+
+            var item_cl3 = document.createElement('td');
+                item_cl3.innerText = node.identifier;
+            item.append(item_cl3);
+
+            var item_cl4 = document.createElement('td');
+                item_cl4.innerText = node.category;
+            item.append(item_cl4);
+
+            var item_cl5 = document.createElement('td');
+            var elements = node.elements;
+            
+            //item_cl5.append(elements);
+////////////////////////
+//////////////////////// TOTALY XSS VULNERABLE
+////////////////////////
+            var inner = "";
+            for (let index = 0; index < elements.length; index++) {
+                const element = elements[index];
+                
+                inner += element.name + " - " + element.element_type;
+                inner += '<br>';
+                //item_cl5.appendChild(document.createElement('br'));
+            }
+            $(item_cl5).html(inner);
+            // elements.forEach(element => {
+            //     //item_cl5.innerHTML += '<br>';
+            //     item_cl5.innerText += element.name + " - " + element.element_type;
+                
+                   // For some reason only prints one break tag
+            //     item_cl5.appendChild(document.createElement('br'));
+            // });
+            item.append(item_cl5);
+
+            {
+                var item_cl6 = document.createElement('td');
+                    item_cl6.setAttribute("class", "text-center");
+                var p_tag = document.createElement('p');
+                p_tag.setAttribute("data-placement", "top");
+                p_tag.setAttribute("data-toggle", "tooltip");
+                p_tag.setAttribute("title", "Edit");
+                var btn = document.createElement('button');
+                btn.setAttribute("node", JSON.stringify(node));
+                btn.setAttribute("class", "btn btn-primary fas fa-edit edit_node_button");
+                btn.setAttribute("data-title", "Edit");
+                btn.setAttribute("data-toggle", "modal");
+                btn.setAttribute("data-target", "#edit");
+                p_tag.append(btn);
+                item_cl6.append(p_tag);
+                item.append(item_cl6);
+            }
+
+            {
+                var item_cl7 = document.createElement('td');
+                    item_cl7.setAttribute("class", "text-center");
+                var p_tag = document.createElement('p');
+                p_tag.setAttribute("data-placement", "top");
+                p_tag.setAttribute("data-toggle", "tooltip");
+                p_tag.setAttribute("title", "Options");
+                var btn = document.createElement('button');
+                btn.setAttribute("node", JSON.stringify(node));
+                btn.setAttribute("class", "btn btn-primary fas fa-ellipsis-v options_node_button");
+                btn.setAttribute("data-title", "Options");
+                btn.setAttribute("data-toggle", "modal");
+                btn.setAttribute("data-target", "#options");
+                p_tag.append(btn);
+                item_cl7.append(p_tag);
+                item.append(item_cl7);
+            }
+            tableBody.append(item);
+        });
+
+        $('.edit_node_button').click(function () {
+            generateEditNodeModal($(this).attr('node'))
+        });
+
+        $('.options_node_button').click(function () {
+            generateOptionsModal($(this).attr('node'))
+        });
+    }
+
+    function generateEditNodeModal(node) {
+        node = JSON.parse(node);
+        var elements = node.elements;
+
+        var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
+        html += '<div class="modal-dialog">';
+        html += '<div class="modal-content">';
+        html += '<div class="modal-header">';
+        html += '<h4 class="modal-title" id="Heading">Editing node <br> Name: '+node.name+' <br> ID: '+node.identifier+'</h4>';
+        html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
+        html += '</div>';
+        html += '<div class="modal-body">';
+
+        html += "<form action='{% url 'node_control_panel' %}' method='post'>";
+        html += '{% csrf_token %}';
+        html += '<input name="node_identifier" type="hidden" value="'+node.identifier+'">';
+        html += '<div class="form-group"> <input name="node_name" class="form-control" type="text" placeholder="Node name" value="'+node.name+'" required> </div>';
+        html += '<div class="form-group"> <input name="node_category" class="form-control" type="text" placeholder="Category" value="'+node.category+'" required> </div>';
+
+        html += '<h5>Element name(s)</h5>';
+        
+        elements.forEach(element => {
+            html += '<div class="form-group"> <input name="'+element.address+'" class="form-control" type="text" value="'+element.name+'" placeholder="'+element.element_type+' - '+element.address+'" required> </div>';
+        });
+        html += '<button id="btn_register_node" type="submit" class="btn btn-warning btn-lg" style="width: 100%;">Save Changes</button>';
+        html += '</form>';
+
+        html += '</div>';
+        html += '<div class="modal-footer">';
+        
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        $('body').append(html);
+        $("#dynamicModal").modal();
+        $("#dynamicModal").modal('show');
+
+        $('#dynamicModal').on('hidden.bs.modal', function (e) {
+            var leave = confirm('Leave without saving?');
+            if(leave)
+                $(this).remove();
+            else
+                $("#dynamicModal").modal('show');
+        });
+    }
+
+    function generateOptionsModal(node) {
+        node = JSON.parse(node);
+        //var elements = node.elements;
+
+        // var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
+            // html += '<div class="modal-dialog">';
+                // html += '<div class="modal-content">';
+                
+                    // html += '<div class="modal-header">';
+                        // html += '<h4 class="modal-title" id="Heading">Node Options <br> Name: '+node.name+' <br> ID: '+node.identifier+'</h4>';
+                        // html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
+                    // html += '</div>';
+                    // html += '<div class="modal-body">';
+
+                        // html += '{% csrf_token %}';
+                        // html += '<button cmd="restart" node_identifier='+node.identifier+' type="button" class="btn btn-warning btn-lg btn_node_cmd_exec" style="width: 100%;">Restart Node</button>';
+                        // html += '<br><br>'
+                        // html += '<button cmd="unregister" node_identifier='+node.identifier+' type="button" class="btn btn-danger btn-lg btn_node_cmd_exec" style="width: 100%;">Unregister Node</button>';
+
+                    // html += '</div>';
+                    // html += '<div class="modal-footer">';
+                    
+                    // html += '</div>';
+                // html += '</div>';
+            // html += '</div>';
+        // html += '</div>';
+
+        var main_elem = document.createElement('div');
+            main_elem.setAttribute("class", "modal fade");
+            main_elem.setAttribute("id", "dynamicModal");
+            main_elem.setAttribute("tabindex", "-1");
+            main_elem.setAttribute("role", "dialog");
+            main_elem.setAttribute("aria-labelledby", "edit");
+            main_elem.setAttribute("aria-hidden", "true");
+        var modal_dialog = document.createElement('div');
+            modal_dialog.setAttribute("class", "modal-dialog");
+            modal_dialog.append(main_elem);
+        var modal_content = document.createElement('div');
+            modal_content.setAttribute("class", "modal-content");
+            modal_content.append(modal_dialog);
+        var modal_header = document.createElement('div');
+            modal_header.setAttribute("class", "modal-header");
+            modal_header.append(modal_content);
+
+        var modal_title = document.createElement('h4');
+            modal_title.setAttribute("class", "modal-title");
+            modal_title.setAttribute("id", "Heading");
+            modal_title.append(modal_header);
+        var modal_close_button = document.createElement('button');
+            modal_close_button.setAttribute("type", "button");
+            modal_close_button.setAttribute("class", "close");
+            modal_close_button.setAttribute("data-dismiss", "modal");
+            modal_close_button.setAttribute("aria-hidden", "true");
+            modal_close_button.append(modal_header);
+            var close_icon = document.createElement('span');
+                close_icon.setAttribute("class", "fas fa-times");
+                close_icon.setAttribute("aria-hidden", "true");
+                close_icon.append(modal_close_button);
+        
+        var modal_body = document.createElement('div');
+            modal_body.setAttribute("class", "modal-body");
+            modal_body.append(modal_content);
+
+        $('body').append(main_elem);
+        $("#dynamicModal").modal();
+        $("#dynamicModal").modal('show');
+
+        $('#dynamicModal').on('hidden.bs.modal', function (e) {
+            $(this).remove();
+        });
+
+        var CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+        
+        $('.btn_node_cmd_exec').on('click', function() {
+            switch($(this).attr('cmd')) {
+                case 'unregister':
+                    var confirmation = confirm('Unregister this node?');
+                    if (confirmation) { 
+                        $.post("{% url 'send_node_command'%}", {command: "unregister", data: node.identifier, csrfmiddlewaretoken: CSRFtoken}, function(response) {
+                            check_command_response(response);
+
+                            console.log("Unregistering node ID: " + node.identifier);
+                        });
+                    }
+                break;
+                case 'restart':
+                    var confirmation = confirm('Restart this node?');
+                    if (confirmation) {
+
+                        console.log("Node restart - UNIMPLEMENTED ACTION");
+                        
+                        $.post("{% url 'send_node_command'%}", {command: "restart", data: node.identifier, csrfmiddlewaretoken: CSRFtoken}, function(response) {
+                            check_command_response(response);
+
+                            console.log("Restarting node ID: " + node.identifier);
+                        });
+                    }
+                break;
+            }
+        });
+
+    }
+
+    function check_command_response(response) {
+        if(response.data == "ok") {
+            notification('', 'Command sent.', 'success');
+        } else if(response.data == "unknown_command") {
+            notification('', 'Unknown command.', 'warning', false, 5000);
+        } else if(response.data == "rejected") {
+            notification('', 'Command or data provided were rejected. Check console.', 'warning', false, 5000);
+        } else {
+            notification('Command Response - ', 'Received unknown response from back-end. Check console.', 'danger', false, 5000);
+            console.error("Command Reponse: ", response);
+        }
+
+    }
+
+    function notification(title = "", message, type = "info", progressBar = false, delay = 1500, z_index = 9031) {
+        $.notify({
+            title: title,
+            message: message,
+
+        }, {
+            delay: delay,
+            z_index: z_index,
+            showProgressbar: progressBar,
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+            type: type
+        });
+    }
+</script>
+
+{% endblock %}

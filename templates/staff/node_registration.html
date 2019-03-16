@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'assets/css/toggle_button/bootstrap-toggle.min.css' %}">
+<script src="{% static 'assets/js/toggle_button/bootstrap-toggle.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+<script src="{% static 'assets/js/bootstrap-notify.min.js' %}"></script>
+
+{% csrf_token %}
+
+<center>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <h2>Node Registration</h2>
+        </div>
+    </div>
+
+    <label for="discovery_switch">Node Discovery</label>
+    <input id="discovery_switch" type="checkbox" data-toggle="toggle" data-onstyle="danger">
+    <h1 style="font-size: 0.7rem; display: block;">*Don't forget to turn off the discovery mode to prevent any security
+        issues.</h1>
+</center>
+<hr>
+
+
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="table-responsive">
+
+                <table id="mytable" class="table table-bordered table-striped">
+
+                    <thead class="thead-light">
+                        <th>Identifier</th>
+                        <th>Elements</th>
+                        <th>Add</th>
+                        <th><button id="refresh_unregistered_list" class="btn btn-primary fas fa-sync-alt" data-toggle="tooltip" data-placement="top" title="Refresh List"></button></th>
+                    </thead>
+                    <tbody id="table_body" class="table-hover">
+                    </tbody>
+
+                </table>
+
+                <div class="clearfix"></div>
+                <!--<ul class="pagination pull-right">
+                        <li class="disabled"><a href="#"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+                        <li class="active"><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+                    </ul>-->
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="modal_pointer"></div>
+
+<script>
+
+    unregistered_node_list = {}
+
+    $.getJSON("{% url 'get_discovery_mode_status' %}")
+        .done(function (json) {
+            $('#discovery_switch').bootstrapToggle(json.data == true ? 'on' : 'off');
+        })
+        .fail(function (jqxhr, textStatus, error) {
+            console.log(error);
+            notification("Error", "Could not get last Discovery Mode state.", "danger");
+        }
+    );
+
+    function refresh_unregistered_list(show_notif=true) {
+        $.getJSON("{% url 'get_unregistered_list' %}")
+            .done(function (json) {
+                console.log("Unregistered list Data: " + json.data);
+
+                unregistered_node_list = json.data;
+                if(show_notif)
+                    notification("", "Unregistered Node list refreshed.", "success");
+
+                populateList(show_notif);
+            })
+            .fail(function (jqxhr, textStatus, error) {
+                console.log(error);
+                notification("Error", "Could not refresh unregistered node list.", "danger");
+            }
+        );
+    }
+
+    function notification(title = "", message, type = "info", progressBar = false, delay = 1500) {
+        $.notify({
+            title: title,
+            message: message,
+            
+        }, {
+            delay: delay,
+            showProgressbar: progressBar,
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+            type: type
+        });
+    }
+
+    function populateList(show_notif=true) {
+        var tableBody = document.getElementById("table_body");
+
+        tableBody.innerHTML = "";
+
+        if(unregistered_node_list.length == 0 && show_notif) {
+            notification("", "No unregistered nodes found.");
+        }
+
+        unregistered_node_list.forEach(node => {
+            var item = document.createElement('tr');
+
+            var item_cl1 = document.createElement('td');
+            item_cl1.innerText = node.identifier;
+            item.appendChild(item_cl1);
+
+            var elements = JSON.parse(node.elements);
+            var item_cl2 = document.createElement('td');
+            elements.forEach(element => {
+                
+                item_cl2.innerText += " | " + element.element_type;
+                
+            });
+            item_cl2.innerText += " | ";
+            item.appendChild(item_cl2);
+
+            var item_cl3 = document.createElement('td');
+                var p_tag = document.createElement('p');
+                p_tag.setAttribute("data-placement", "top");
+                p_tag.setAttribute("data-toggle", "tooltip");
+                p_tag.setAttribute("title", "Add");
+                    var btn = document.createElement('button');
+                    btn.setAttribute("node", JSON.stringify(node));
+                    btn.setAttribute("class", "btn btn-primary fas fa-plus-square open_registration_modal");
+                    btn.setAttribute("data-title", "Add");
+                    btn.setAttribute("data-toggle", "modal");
+                    btn.setAttribute("data-target", "#add");
+                p_tag.appendChild(btn);
+            item_cl3.appendChild(p_tag);
+            item.appendChild(item_cl3);
+
+            tableBody.appendChild(item);
+        });
+
+        $('.open_registration_modal').click(function () {
+            generateModal($(this).attr('node'))
+        })
+    }
+
+    function generateModal(node) {
+        node = JSON.parse(node);
+        var elements = JSON.parse(node.elements);
+
+        var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
+        html += '<div class="modal-dialog">';
+        html += '<div class="modal-content">';
+        html += '<div class="modal-header">';
+        html += '<h4 class="modal-title" id="Heading">Register node ID: '+node.identifier+'</h4>';
+        html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
+        html += '</div>';
+        html += '<div class="modal-body">';
+        
+        html += "<form action='{% url 'node_registration' %}' method='post'>";
+        html += '{% csrf_token %}';
+        html += '<input name="node_identifier" type="hidden" value="'+node.identifier+'">';
+        html += '<div class="form-group"> <input name="node_name" class="form-control" type="text" placeholder="Node name" required> </div>';
+        html += '<div class="form-group"> <input name="node_category" class="form-control" type="text" placeholder="Category" required> </div>';
+
+        html += '<h5>Element name(s)</h5>';
+        
+        elements.forEach(element => {
+            html += '<div class="form-group"> <input name="'+element.address+'" class="form-control" type="text" placeholder="'+element.element_type+' - '+element.address+'" required> </div>';
+            html += '<input name="elemtype_'+element.address+'" type="hidden" value="'+element.element_type+'">';
+        });
+        html += '<button id="btn_register_node" type="submit" class="btn btn-warning btn-lg" style="width: 100%;">Register</button>';
+        html += '</form>';
+
+        html += '</div>';
+        html += '<div class="modal-footer">';
+        
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        $('body').append(html);
+        $("#dynamicModal").modal();
+        $("#dynamicModal").modal('show');
+
+        $('#dynamicModal').on('hidden.bs.modal', function (e) {
+            var leave = confirm('Leave without registering?');
+            if(leave)
+                $(this).remove();
+            else
+                $("#dynamicModal").modal('show');
+        });
+    }
+
+    $(function () {
+
+        var CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+
+        $('#discovery_switch').change(function () {
+            if ($(this).prop('checked')) {
+                $.post("{% url 'set_blackbox_discovery' %}", { data: "enable", csrfmiddlewaretoken: CSRFtoken });
+
+                notification("", "Refreshing unregistered node list...", "info", true, 3000);
+
+                var times = 0;
+                var interval = setInterval(function() {
+                    if(times >= 2){
+                        clearInterval(interval);
+                    }
+
+                    refresh_unregistered_list(false);
+                    times++;
+                }, 1000);
+            } else {
+                $.post("{% url 'set_blackbox_discovery' %}", { data: "disable", csrfmiddlewaretoken: CSRFtoken });
+            }
+
+        })
+
+        $('#refresh_unregistered_list').on('click', function () {
+            refresh_unregistered_list();
+        })
+    })
+</script>
+
+
+{% endblock %}
