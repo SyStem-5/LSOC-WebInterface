@@ -1,9 +1,11 @@
 # Disable annoying 'no member' error
 # pylint: disable=E1101
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from project01.fields import IntegerRangeField
 
@@ -17,17 +19,18 @@ class LSOCProfile(models.Model):
         return self.user.username
 
 
-def create_profile(sender, **kwargs):
-    if kwargs['created']:
-        _lsoc_profile = LSOCProfile(
-            user=kwargs['instance'],
-            lsoc_permissions=kwargs['instance'].lsocprofile.lsoc_permissions,
-            description=kwargs['instance'].lsocprofile.description)
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    # This will create a default instance if it wasn't provided, if it was provided it will insert it
+    try:
+        lsoc_profile = LSOCProfile(
+            user=instance,
+            lsoc_permissions=instance.lsocprofile.lsoc_permissions,
+            description=instance.lsocprofile.description)
 
-        _lsoc_profile.save()
-
-
-post_save.connect(create_profile, sender=User)
+        lsoc_profile.save()
+    except ObjectDoesNotExist:
+        LSOCProfile.objects.get_or_create(user=instance)
 
 
 class MQTTConfig(models.Model):
