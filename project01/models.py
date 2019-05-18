@@ -19,18 +19,17 @@ class LSOCProfile(models.Model):
         return self.user.username
 
 
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    # This will create a default instance if it wasn't provided, if it was provided it will insert it
-    try:
-        lsoc_profile = LSOCProfile(
-            user=instance,
-            lsoc_permissions=instance.lsocprofile.lsoc_permissions,
-            description=instance.lsocprofile.description)
-
-        lsoc_profile.save()
-    except ObjectDoesNotExist:
-        LSOCProfile.objects.get_or_create(user=instance)
+# @receiver(post_save, sender=LSOCProfile)
+# def create_profile(sender, instance, created, **kwargs):
+#     # This will create a default instance if it wasn't provided, if it was provided it will insert it
+#     try:
+#       lsoc_profile = LSOCProfile(
+#           user=instance,
+#           lsoc_permissions=instance.lsocprofile.lsoc_permissions,
+#           description=instance.lsocprofile.description)
+#       lsoc_profile.save()
+#     except ObjectDoesNotExist:
+#       LSOCProfile.objects.get_or_create(user=instance)
 
 
 class MQTTConfig(models.Model):

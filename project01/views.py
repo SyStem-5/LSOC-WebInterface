@@ -45,7 +45,7 @@ def account_management(request):
 @permission_required('superuser')
 def account_designer(request):
     template = 'staff/account_designer.html'
-    
+
     if request.method == 'GET':
         return render(request, template, {
             'title': 'LSOC - Account Designer',
@@ -61,15 +61,15 @@ def account_designer(request):
             new_user.username = form.cleaned_data['username']
             new_user.password = form.cleaned_data['password1']
 
+            saved_user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'])
+
             lsocprofile = LSOCProfile()
-            lsocprofile.user = new_user
+            lsocprofile.user = saved_user
             lsocprofile.lsoc_permissions = form.cleaned_data['lsoc_permissions']
             lsocprofile.description = form.cleaned_data['description']
-
-            _user = User.objects.create_user(
-                username=form.cleaned_data['username'], 
-                password=form.cleaned_data['password1'],
-                lsocprofile=lsocprofile)
+            lsocprofile.save()
 
             return redirect(to='account_management')
         else:
@@ -123,7 +123,7 @@ def get_discovery_mode_status(request):
 @permission_required('superuser')
 def node_control_panel(request):
     template = 'staff/node_control_panel.html'
-    
+
     if request.method == 'GET':
         return render(request, template, {
             'title': 'LSOC - NCP',
