@@ -27,6 +27,13 @@ if use_secrets:
 else:
     SECRET_KEY = os.getenv('SECRET_KEY')
 
+if use_secrets:
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    X_FRAME_OPTIONS = "DENY"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 # If we're using secrets, we are in production, debugging is off
 DEBUG = not use_secrets
