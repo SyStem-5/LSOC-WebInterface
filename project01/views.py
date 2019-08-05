@@ -33,6 +33,7 @@ def settings(request):
 @permission_required('superuser')
 def account_management(request):
     # if request.method == 'GET':
+    #test
     template = 'staff/account_management.html'
 
     return render(request, template, {
