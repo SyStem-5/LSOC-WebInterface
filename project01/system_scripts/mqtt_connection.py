@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.db import connection
 from channels.layers import get_channel_layer
 from project01.models import MQTTConfig
-from project01.settings import DATABASES, DEBUG
+from project01.settings import DEBUG
 import paho.mqtt.client as mqtt
 
 
@@ -20,6 +20,7 @@ main_topic = "external_interface"
 
 ws_superuser_groups = ['node_state']
 ws_normaluser_groups = ['blackbox_state']
+
 
 class CommandType(Enum):
     NodeElementList = "NodeElementList"
@@ -34,9 +35,11 @@ class CommandType(Enum):
     NodeOffline = "NodeOffline"
     UpdateNodeInfo = "UpdateNodeInfo"
 
+
 class WSCommandType(Enum):
     NodeState = "NodeState"
     BlackBoxState = "BlackBoxState"
+
 
 class WSType(Enum):
     NodeState = "node.state"
@@ -79,7 +82,6 @@ if db_connected:
         def_config.save()
         settings = def_config
 
-
     def blackbox_new_command(commandType, data="", send=False):
         command = '{"command" : "' + commandType.name + \
             '", "data" : "' + data + '"}'
@@ -87,8 +89,8 @@ if db_connected:
         if not send:
             return command
         else:
-            client.publish(topic=main_topic+"/"+settings.username, payload=command)
-
+            client.publish(topic=main_topic+"/" +
+                           settings.username, payload=command)
 
     def blackbox_discovery_enable():
         print("BlackBox: Enabling Discovery")
@@ -103,7 +105,6 @@ if db_connected:
         blackbox_new_command(CommandType.DiscoveryEnable, send=True)
         return JsonResponse({"data": "ok"})
 
-
     def blackbox_discovery_disable():
         print("BlackBox: Disabling Discovery")
 
@@ -112,7 +113,6 @@ if db_connected:
 
         blackbox_new_command(CommandType.DiscoveryDisable, send=True)
         return JsonResponse({"data": "ok"})
-
 
     def blackbox_node_registration(data):
         node = {}
@@ -127,11 +127,19 @@ if db_connected:
             elif key == "node_category":
                 node[key] = data[key]
             elif not key.startswith('elemtype_'):
-                elements.append({"node_id": "", "address": key, "name": data[key], "element_type": data['elemtype_'+key], "data": "0"})
+                elements.append(
+                    {
+                        "node_id": "",
+                        "address": key,
+                        "name": data[key],
+                        "element_type": data['elemtype_'+key],
+                        "data": "0"
+                    })
 
         node["elements"] = elements
 
-        blackbox_new_command(CommandType.NodeRegistration, data=json.dumps(node).replace('"', "'"), send=True)
+        blackbox_new_command(CommandType.NodeRegistration,
+                             data=json.dumps(node).replace('"', "'"), send=True)
         print("BlackBox: Registering a node. ID:", data["node_identifier"])
 
         # Since we have a new node, we need to update the Node/Element list
@@ -158,8 +166,11 @@ if db_connected:
 
         node["elements"] = elements
 
-        blackbox_new_command(CommandType.UpdateNodeInfo, data=json.dumps(node).replace('"', "'"), send=True)
-        print("BlackBox: Sending edited node information. ID:", data["node_identifier"])
+        blackbox_new_command(CommandType.UpdateNodeInfo,
+            data=json.dumps(node).replace('"', "'"), send=True)
+
+        print("BlackBox: Sending edited node information. ID:",
+              data["node_identifier"])
 
         # Since we have a new node, we need to update the Node/Element list
         blackbox_new_command(CommandType.NodeElementList, send=True)
@@ -181,7 +192,6 @@ if db_connected:
         blackbox_new_command(CommandType.NodeElementList, send=True)
         return JsonResponse({"data": "ok"})
 
-
     def set_node_state(node_identifier, node_state):
         global node_element_list
         for node in node_element_list:
@@ -194,10 +204,14 @@ if db_connected:
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             ws_superuser_groups[0],
-            {"type": WSType.NodeState.value, "command": WSCommandType.NodeState.name, "node_id": str(node_ide), "state": str(node_sta)}
+            {
+                "type": WSType.NodeState.value,
+                "command": WSCommandType.NodeState.name,
+                "node_id": str(node_ide),
+                "state": str(node_sta)
+            }
             #ws_command_creator(WSType.NodeState, WSCommandType.NodeState, str(node_ide+','+node_sta))
         )
-
 
     def on_connect(client, userdata, flags, rc):
         print("MQTT: Connected with result code " + str(rc) + "\n")
@@ -206,13 +220,11 @@ if db_connected:
 
         client.subscribe(main_topic, qos=1)
 
-
     def on_disconnect(client, userdata, rc):
         if rc != 0:
             print("MQTT: Failed to connect to broker. rc =", rc)
         else:
             print("MQTT: Client Disconnect.")
-
 
     def on_message(client, userdata, msg):
         if msg.topic == "external_interface":
@@ -266,11 +278,9 @@ if db_connected:
             print("Message received on an unknown topic:", msg.topic)
             print("With Message:", msg.payload)
 
-
     def on_subscribe(client, userdata, mid, granted_qos):
         #print("MQTT: Subscribe successfull")
         blackbox_new_command(CommandType.NodeElementList, send=True)
-
 
     client = mqtt.Client(client_id=settings.username)
     client.on_connect = on_connect
@@ -278,12 +288,11 @@ if db_connected:
     client.on_subscribe = on_subscribe
     client.on_disconnect = on_disconnect
 
-
     def connect_mqtt():
         print("MQTT: Connecting to", settings.ip)
         try:
             client.username_pw_set(username=settings.username,
-                                password=settings.password)
+                                   password=settings.password)
             client.will_set(topic=main_topic+"/"+settings.username,
                             payload=blackbox_new_command(CommandType.AnnounceOffline),
                             qos=1)
@@ -304,16 +313,13 @@ if db_connected:
         except Exception as e:
             print("MQTT:", e)
 
-
     connect_mqtt()
-
 
     def disconnect_mqtt():
         blackbox_new_command(CommandType.DiscoveryDisable, send=True)
 
         client.disconnect()
         client.loop_stop()
-
 
     def update_mqttconfig(config):
         new_config = MQTTConfig(id=1,
