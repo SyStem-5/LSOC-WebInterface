@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.db import connection
 from channels.layers import get_channel_layer
 from project01.models import MQTTConfig
-from project01.settings import DATABASES
+from project01.settings import DATABASES, DEBUG
 import paho.mqtt.client as mqtt
 
 
@@ -106,7 +106,7 @@ if db_connected:
 
     def blackbox_discovery_disable():
         print("BlackBox: Disabling Discovery")
-        
+
         global discovery_mode
         discovery_mode = False
 
@@ -288,6 +288,16 @@ if db_connected:
                             payload=blackbox_new_command(CommandType.AnnounceOffline),
                             qos=1)
             #print("MQTT: Skipping connection...")
+
+            if DEBUG:
+                client.tls_set(ca_certs="/etc/mosquitto/ca.crt")
+                # This is a temporary fix
+                client.tls_insecure_set(True)
+            else:
+                print("CONNECTING WITH MQTT IS NOT POSSIBLE DUE TO CERTIFICATE NOT HAVING A SAN FIELD.")
+                # This WILL FAIL in a production environment
+                client.tls_set(ca_certs="/mosquitto/config/ca.crt")
+
             client.connect(host=settings.ip, port=settings.port, keepalive=30)
             #client.connect_async(host=settings.ip, port=settings.port, keepalive=30)
             client.loop_start()
