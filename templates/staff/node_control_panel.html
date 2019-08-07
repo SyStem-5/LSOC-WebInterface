@@ -74,7 +74,7 @@
     });
     socket.addEventListener('message', function (event) {
         var payload = JSON.parse((event.data).replace(/[']/g,'"'));
-        
+
         if(payload.command == "NodeState") {
             set_node_state_indicator(payload.node_id, payload.state == "true" ? true : false);
         }
@@ -155,28 +155,10 @@
             item.append(item_cl4);
 
             var item_cl5 = document.createElement('td');
-            var elements = node.elements;
-            
-            //item_cl5.append(elements);
-////////////////////////
-//////////////////////// TOTALY XSS VULNERABLE
-////////////////////////
-            var inner = "";
-            for (let index = 0; index < elements.length; index++) {
-                const element = elements[index];
-                
-                inner += element.name + " - " + element.element_type;
-                inner += '<br>';
-                //item_cl5.appendChild(document.createElement('br'));
-            }
-            $(item_cl5).html(inner);
-            // elements.forEach(element => {
-            //     //item_cl5.innerHTML += '<br>';
-            //     item_cl5.innerText += element.name + " - " + element.element_type;
-                
-                   // For some reason only prints one break tag
-            //     item_cl5.appendChild(document.createElement('br'));
-            // });
+            node.elements.forEach(element => {
+                item_cl5.append(document.createTextNode(element.element_type + " -> " + element.name));
+                item_cl5.append(document.createElement('br'));
+            });
             item.append(item_cl5);
 
             {
@@ -201,15 +183,15 @@
                 var item_cl7 = document.createElement('td');
                     item_cl7.setAttribute("class", "text-center");
                 var p_tag = document.createElement('p');
-                p_tag.setAttribute("data-placement", "top");
-                p_tag.setAttribute("data-toggle", "tooltip");
-                p_tag.setAttribute("title", "Options");
+                    p_tag.setAttribute("data-placement", "top");
+                    p_tag.setAttribute("data-toggle", "tooltip");
+                    p_tag.setAttribute("title", "Options");
                 var btn = document.createElement('button');
-                btn.setAttribute("node", JSON.stringify(node));
-                btn.setAttribute("class", "btn btn-primary fas fa-ellipsis-v options_node_button");
-                btn.setAttribute("data-title", "Options");
-                btn.setAttribute("data-toggle", "modal");
-                btn.setAttribute("data-target", "#options");
+                    btn.setAttribute("node", JSON.stringify(node));
+                    btn.setAttribute("class", "btn btn-primary fas fa-ellipsis-v options_node_button");
+                    btn.setAttribute("data-title", "Options");
+                    btn.setAttribute("data-toggle", "modal");
+                    btn.setAttribute("data-target", "#options");
                 p_tag.append(btn);
                 item_cl7.append(p_tag);
                 item.append(item_cl7);
@@ -231,37 +213,49 @@
         var elements = node.elements;
 
         var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
-        html += '<div class="modal-dialog">';
-        html += '<div class="modal-content">';
-        html += '<div class="modal-header">';
-        html += '<h4 class="modal-title" id="Heading">Editing node <br> Name: '+node.name+' <br> ID: '+node.identifier+'</h4>';
-        html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
-        html += '</div>';
-        html += '<div class="modal-body">';
+            html += '<div class="modal-dialog">';
+                html += '<div class="modal-content">';
+                    html += '<div class="modal-header">';
+                    html += '<h4 class="modal-title" id="Heading"></h4>';
+                    html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
+                    html += '</div>';
+                html += '<div class="modal-body">';
+                    html += "<form action='{% url 'node_control_panel' %}' method='post'>";
+                        html += '{% csrf_token %}';
+                        html += '<input name="node_identifier" type="hidden" id="input_node_identifier">';
+                        html += '<div class="form-group"> <input name="node_name" class="form-control" type="text" placeholder="Node name" id="input_node_name" required> </div>';
+                        html += '<div class="form-group"> <input name="node_category" class="form-control" type="text" placeholder="Category" id="input_node_category" required> </div>';
 
-        html += "<form action='{% url 'node_control_panel' %}' method='post'>";
-        html += '{% csrf_token %}';
-        html += '<input name="node_identifier" type="hidden" value="'+node.identifier+'">';
-        html += '<div class="form-group"> <input name="node_name" class="form-control" type="text" placeholder="Node name" value="'+node.name+'" required> </div>';
-        html += '<div class="form-group"> <input name="node_category" class="form-control" type="text" placeholder="Category" value="'+node.category+'" required> </div>';
+                        html += '<h5>Element name(s)</h5>';
 
-        html += '<h5>Element name(s)</h5>';
-        
-        elements.forEach(element => {
-            html += '<div class="form-group"> <input name="'+element.address+'" class="form-control" type="text" value="'+element.name+'" placeholder="'+element.element_type+' - '+element.address+'" required> </div>';
-        });
-        html += '<button id="btn_register_node" type="submit" class="btn btn-warning btn-lg" style="width: 100%;">Save Changes</button>';
-        html += '</form>';
+                        elements.forEach(element => {
+                            html += '<div class="form-group"> <input name="'+encodeURIComponent(element.address)+'" class="form-control" type="text" id="'+encodeURIComponent(element.address)+'_element" value="" required> </div>';
+                        });
 
-        html += '</div>';
-        html += '<div class="modal-footer">';
-        
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
+                        html += '<button id="btn_register_node" type="submit" class="btn btn-warning btn-lg" style="width: 100%;">Save Changes</button>';
+                    html += '</form>';
+                html += '</div>';
+                //html += '<div class="modal-footer">'; html += '</div>';
+                html += '</div>';
+            html += '</div>';
         html += '</div>';
 
         $('body').append(html);
+
+        // We set these here so we avoid making XSS vulnerabilities by string concatenation
+        $("#Heading").append("Node Settings");
+        $("#Heading").append(document.createElement("br"));
+        $("#Heading").append(document.createTextNode("Name: " + node.name));
+        $("#Heading").append(document.createElement("br"));
+        $("#Heading").append(document.createTextNode("ID: " + node.identifier));
+        $("#input_node_identifier").attr("value", node.identifier);
+        $("#input_node_name").attr("value", node.name);
+        $("#input_node_category").attr("value", node.category);
+        elements.forEach(element => {
+            $("#"+encodeURIComponent(element.address)+"_element").attr("value", element.name);
+            $("#"+encodeURIComponent(element.address)+"_element").attr("placeholder", element.element_type+' - '+element.address);
+        });
+
         $("#dynamicModal").modal();
         $("#dynamicModal").modal('show');
 
@@ -276,68 +270,41 @@
 
     function generateOptionsModal(node) {
         node = JSON.parse(node);
-        //var elements = node.elements;
 
-        // var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
-            // html += '<div class="modal-dialog">';
-                // html += '<div class="modal-content">';
-                
-                    // html += '<div class="modal-header">';
-                        // html += '<h4 class="modal-title" id="Heading">Node Options <br> Name: '+node.name+' <br> ID: '+node.identifier+'</h4>';
-                        // html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
-                    // html += '</div>';
-                    // html += '<div class="modal-body">';
+        var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
+            html += '<div class="modal-dialog">';
+                html += '<div class="modal-content">';
 
-                        // html += '{% csrf_token %}';
-                        // html += '<button cmd="restart" node_identifier='+node.identifier+' type="button" class="btn btn-warning btn-lg btn_node_cmd_exec" style="width: 100%;">Restart Node</button>';
-                        // html += '<br><br>'
-                        // html += '<button cmd="unregister" node_identifier='+node.identifier+' type="button" class="btn btn-danger btn-lg btn_node_cmd_exec" style="width: 100%;">Unregister Node</button>';
+                    html += '<div class="modal-header">';
+                        html += '<h4 class="modal-title" id="Heading"></h4>';
+                        html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
+                    html += '</div>';
+                    html += '<div class="modal-body">';
 
-                    // html += '</div>';
-                    // html += '<div class="modal-footer">';
-                    
-                    // html += '</div>';
-                // html += '</div>';
-            // html += '</div>';
-        // html += '</div>';
+                        html += '{% csrf_token %}';
+                        html += '<button cmd="restart" node_identifier="" type="button" id="btn_cmd_restart" class="btn btn-warning btn-lg btn_node_cmd_exec" style="width: 100%;">Restart Node</button>';
+                        html += '<br><br>'
+                        html += '<button cmd="unregister" node_identifier="" type="button" id="btn_cmd_unregister" class="btn btn-danger btn-lg btn_node_cmd_exec" style="width: 100%;">Unregister Node</button>';
 
-        var main_elem = document.createElement('div');
-            main_elem.setAttribute("class", "modal fade");
-            main_elem.setAttribute("id", "dynamicModal");
-            main_elem.setAttribute("tabindex", "-1");
-            main_elem.setAttribute("role", "dialog");
-            main_elem.setAttribute("aria-labelledby", "edit");
-            main_elem.setAttribute("aria-hidden", "true");
-        var modal_dialog = document.createElement('div');
-            modal_dialog.setAttribute("class", "modal-dialog");
-            modal_dialog.append(main_elem);
-        var modal_content = document.createElement('div');
-            modal_content.setAttribute("class", "modal-content");
-            modal_content.append(modal_dialog);
-        var modal_header = document.createElement('div');
-            modal_header.setAttribute("class", "modal-header");
-            modal_header.append(modal_content);
+                    html += '</div>';
+                    html += '<div class="modal-footer">';
 
-        var modal_title = document.createElement('h4');
-            modal_title.setAttribute("class", "modal-title");
-            modal_title.setAttribute("id", "Heading");
-            modal_title.append(modal_header);
-        var modal_close_button = document.createElement('button');
-            modal_close_button.setAttribute("type", "button");
-            modal_close_button.setAttribute("class", "close");
-            modal_close_button.setAttribute("data-dismiss", "modal");
-            modal_close_button.setAttribute("aria-hidden", "true");
-            modal_close_button.append(modal_header);
-            var close_icon = document.createElement('span');
-                close_icon.setAttribute("class", "fas fa-times");
-                close_icon.setAttribute("aria-hidden", "true");
-                close_icon.append(modal_close_button);
-        
-        var modal_body = document.createElement('div');
-            modal_body.setAttribute("class", "modal-body");
-            modal_body.append(modal_content);
+                    html += '</div>';
+                html += '</div>';
+            html += '</div>';
+        html += '</div>';
 
-        $('body').append(main_elem);
+        $('body').append(html);
+
+        // We set these here so we avoid making XSS vulnerabilities by string concatenation
+        $("#Heading").text("Node Options");
+        $("#Heading").append(document.createElement("br"));
+        $("#Heading").append(document.createTextNode("Name: " + node.name));
+        $("#Heading").append(document.createElement("br"));
+        $("#Heading").append(document.createTextNode("ID: " + node.identifier));
+        $("#btn_cmd_restart").attr("node_identifier", node.identifier);
+        $("#btn_cmd_unregister").attr("node_identifier", node.identifier);
+
         $("#dynamicModal").modal();
         $("#dynamicModal").modal('show');
 
@@ -346,12 +313,12 @@
         });
 
         var CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-        
+
         $('.btn_node_cmd_exec').on('click', function() {
             switch($(this).attr('cmd')) {
                 case 'unregister':
                     var confirmation = confirm('Unregister this node?');
-                    if (confirmation) { 
+                    if (confirmation) {
                         $.post("{% url 'send_node_command'%}", {command: "unregister", data: node.identifier, csrfmiddlewaretoken: CSRFtoken}, function(response) {
                             check_command_response(response);
 
@@ -364,7 +331,7 @@
                     if (confirmation) {
 
                         console.log("Node restart - UNIMPLEMENTED ACTION");
-                        
+
                         $.post("{% url 'send_node_command'%}", {command: "restart", data: node.identifier, csrfmiddlewaretoken: CSRFtoken}, function(response) {
                             check_command_response(response);
 
