@@ -102,7 +102,7 @@
         $.notify({
             title: title,
             message: message,
-            
+
         }, {
             delay: delay,
             showProgressbar: progressBar,
@@ -133,9 +133,9 @@
             var elements = JSON.parse(node.elements);
             var item_cl2 = document.createElement('td');
             elements.forEach(element => {
-                
+
                 item_cl2.innerText += " | " + element.element_type;
-                
+
             });
             item_cl2.innerText += " | ";
             item.appendChild(item_cl2);
@@ -168,38 +168,43 @@
         var elements = JSON.parse(node.elements);
 
         var html = '<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">';
-        html += '<div class="modal-dialog">';
-        html += '<div class="modal-content">';
-        html += '<div class="modal-header">';
-        html += '<h4 class="modal-title" id="Heading">Register node ID: '+node.identifier+'</h4>';
-        html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
-        html += '</div>';
-        html += '<div class="modal-body">';
-        
-        html += "<form action='{% url 'node_registration' %}' method='post'>";
-        html += '{% csrf_token %}';
-        html += '<input name="node_identifier" type="hidden" value="'+node.identifier+'">';
-        html += '<div class="form-group"> <input name="node_name" class="form-control" type="text" placeholder="Node name" required> </div>';
-        html += '<div class="form-group"> <input name="node_category" class="form-control" type="text" placeholder="Category" required> </div>';
+            html += '<div class="modal-dialog">';
+                html += '<div class="modal-content">';
+                    html += '<div class="modal-header">';
+                        html += '<h4 class="modal-title" id="Heading"></h4>';
+                        html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="fas fa-times" aria-hidden="true"></span></button>';
+                        html += '</div>';
+                    html += '<div class="modal-body">';
+                        html += "<form action='{% url 'node_registration' %}' method='post'>";
+                            html += '{% csrf_token %}';
+                            html += '<input name="node_identifier" type="hidden" id="input_node_identifier">';
+                            html += '<div class="form-group"> <input name="node_name" class="form-control" type="text" placeholder="Node name" required> </div>';
+                            html += '<div class="form-group"> <input name="node_category" class="form-control" type="text" placeholder="Category" required> </div>';
 
-        html += '<h5>Element name(s)</h5>';
-        
-        elements.forEach(element => {
-            html += '<div class="form-group"> <input name="'+element.address+'" class="form-control" type="text" placeholder="'+element.element_type+' - '+element.address+'" required> </div>';
-            html += '<input name="elemtype_'+element.address+'" type="hidden" value="'+element.element_type+'">';
-        });
-        html += '<button id="btn_register_node" type="submit" class="btn btn-warning btn-lg" style="width: 100%;">Register</button>';
-        html += '</form>';
+                            html += '<h5>Element name(s)</h5>';
 
-        html += '</div>';
-        html += '<div class="modal-footer">';
-        
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
+                            elements.forEach(element => {
+                                html += '<div class="form-group"> <input name="'+encodeURIComponent(element.address)+'" class="form-control" type="text" id="'+encodeURIComponent(element.address)+'_element" required> </div>';
+                                html += '<input name="elemtype_'+encodeURIComponent(element.address)+'" type="hidden" id="'+encodeURIComponent(element.address)+'_elementtype" value="">';
+                            });
+                            html += '<button id="btn_register_node" type="submit" class="btn btn-warning btn-lg" style="width: 100%;">Register</button>';
+                        html += '</form>';
+                    html += '</div>';
+                    html += '<div class="modal-footer">';
+                    html += '</div>';
+                html += '</div>';
+            html += '</div>';
         html += '</div>';
 
         $('body').append(html);
+
+        $("#Heading").text("Register node ID:" + node.identifier);
+        $("#input_node_identifier").attr("value", node.identifier);
+        elements.forEach(element => {
+            $("#"+encodeURIComponent(element.address)+"_element").attr("placeholder", element.element_type+' - '+element.address);
+            $("#"+encodeURIComponent(element.address)+"_elementtype").attr("value", element.element_type);
+        });
+
         $("#dynamicModal").modal();
         $("#dynamicModal").modal('show');
 
