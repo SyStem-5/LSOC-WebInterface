@@ -300,12 +300,8 @@ if db_connected:
 
             if DEBUG:
                 client.tls_set(ca_certs="/etc/mosquitto/ca.crt")
-                # This is a temporary fix
-                client.tls_insecure_set(True)
             else:
-                print("CONNECTING WITH MQTT IS NOT POSSIBLE DUE TO CERTIFICATE NOT HAVING A SAN FIELD.")
-                # This WILL FAIL in a production environment
-                client.tls_set(ca_certs="/mosquitto/config/ca.crt")
+                client.tls_set(ca_certs="/run/secrets/mqtt_ca.crt")
 
             client.connect(host=settings.ip, port=settings.port, keepalive=30)
             #client.connect_async(host=settings.ip, port=settings.port, keepalive=30)
