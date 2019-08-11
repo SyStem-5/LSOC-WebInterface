@@ -2,11 +2,9 @@
 
 {% block content %}
 
-<center>
-    <div class="card" style="max-width: 250px;">
-        <center>
-            <h2 style="color:black;">{{ title }}</h2>
-        </center>
+<div class="card mx-auto align-self-center" style="max-width: 250px; min-width: 150px;">
+    <div class="card-header text-center" style="font-size: x-large; color:black;">{{ title }}</div>
+    <div class="card-body" style="padding: 0;">
         <form action="." method="POST" class="form-horizontal">
             {% csrf_token %}
             <!--<h4>Use a local account to log in.</h4>-->
@@ -27,10 +25,9 @@
             {% endif %}
         </form>
     </div>
-</center>
+</div>
 
 {% endblock %}
-
 
 {% block scripts %}
 
