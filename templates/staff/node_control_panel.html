@@ -64,8 +64,9 @@
 
     refresh_nodes_list(false);
 
+    // This allows websockets to be used on a production and the development build
     const socket = new WebSocket(
-        'ws://' + window.location.host +
+        (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + window.location.host +
         '/superuser');
 
     socket.addEventListener('open', function (event) {
