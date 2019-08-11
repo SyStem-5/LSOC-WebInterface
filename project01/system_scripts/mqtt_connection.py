@@ -57,14 +57,8 @@ unregistered_nodes_list = []
 discovery_mode = False
 blackbox_status = False
 
-db_connected = True
 mqtt_config_db_table_name = "project01_mqttconfig"
-
-if mqtt_config_db_table_name not in connection.introspection.table_names():
-    db_connected = False
-    print("MQTTSettings database table does not exist. Skipping MQTT Init.")
-
-if db_connected:
+if mqtt_config_db_table_name in connection.introspection.table_names():
     # Fetch client config from database
     settings = MQTTConfig.objects.all()
 
