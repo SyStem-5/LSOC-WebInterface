@@ -32,7 +32,7 @@
 
 <body>
     <!-- <div class="background-image"></div> -->
-    <div class="page-wrapper chiller-theme sidebar-bg bg1 toggled">
+    <div class="page-wrapper toggled">
         <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
             <i class="fas fa-bars"></i>
         </a>
@@ -410,24 +410,29 @@
 </body>
 
 <script>
+    var default_theme = "ice-theme";
     $(document).ready(function () {
         var themeCookie = Cookies.get("theme");
-        if (themeCookie != "undefined") {
+        if (themeCookie) {
             setTheme(themeCookie);
+        } else {
+            setTheme(default_theme);
         }
 
         var showSidebarBgCookie = Cookies.get("sidebar_show_bg");
-        if (showSidebarBgCookie != "undefined") {
+        if (showSidebarBgCookie) {
             setSidebarBgVisible(showSidebarBgCookie == "true" ? true : false);
 
             //If its defined and true, set the bg image to whatever's saved
             if (showSidebarBgCookie == "true") {
                 var sidebarBgCookie = Cookies.get("sidebar_bg");
 
-                if (sidebarBgCookie != "undefined") {
+                if (sidebarBgCookie) {
                     setBackground(sidebarBgCookie);
                 }
             }
+        } else {
+            setSidebarBgVisible(false);
         }
     });
 
