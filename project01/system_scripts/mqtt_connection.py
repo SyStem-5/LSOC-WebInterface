@@ -21,6 +21,8 @@ main_topic = "external_interface"
 ws_superuser_groups = ['node_state']
 ws_normaluser_groups = ['blackbox_state']
 
+mqtt_debug_string = ">MQTT:"
+
 
 class CommandType(Enum):
     NodeElementList = "NodeElementList"
@@ -50,7 +52,7 @@ class WSType(Enum):
 #     return payload
 
 
-print("MQTT: Initializing MQTT Client sub-system...")
+print(mqtt_debug_string, "Initializing MQTT Client sub-system...")
 
 node_element_list = None
 unregistered_nodes_list = []
@@ -63,11 +65,11 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
     settings = MQTTConfig.objects.all()
 
     if len(settings) > 0:
-        print("MQTT: Client Loaded\n")
+        print(mqtt_debug_string, "Client Loaded\n")
         settings = settings[0]
     else:
-        print("MQTT: No mqtt client configuration found.")
-        print("MQTT: Creating and using a default configuration.\n")
+        print(mqtt_debug_string, "No mqtt client configuration found.")
+        print(mqtt_debug_string, "Creating and using a default configuration.\n")
         def_config = MQTTConfig()
         def_config.ip = '127.0.0.1'
         def_config.port = 8883
@@ -161,7 +163,7 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
         node["elements"] = elements
 
         blackbox_new_command(CommandType.UpdateNodeInfo,
-            data=json.dumps(node).replace('"', "'"), send=True)
+                             data=json.dumps(node).replace('"', "'"), send=True)
 
         print("BlackBox: Sending edited node information. ID:",
               data["node_identifier"])
@@ -190,7 +192,8 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
         global node_element_list
         for node in node_element_list:
             if node['identifier'] == node_identifier:
-                node_element_list[node_element_list.index(node)]['state'] = node_state
+                node_element_list[node_element_list.index(
+                    node)]['state'] = node_state
 
         node_ide = str(node_identifier)
         node_sta = str(node_state).lower()
@@ -208,7 +211,7 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
         )
 
     def on_connect(client, userdata, flags, rc):
-        print("MQTT: Connected with result code " + str(rc) + "\n")
+        print(mqtt_debug_string, "Connected with result code " + str(rc) + "\n")
 
         blackbox_new_command(CommandType.AnnounceOnline, send=True)
 
@@ -216,9 +219,9 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
 
     def on_disconnect(client, userdata, rc):
         if rc != 0:
-            print("MQTT: Failed to connect to broker. rc =", rc)
+            print(mqtt_debug_string, "Failed to connect to broker. rc =", rc)
         else:
-            print("MQTT: Client Disconnect.")
+            print(mqtt_debug_string, "Client Disconnect.")
 
     def on_message(client, userdata, msg):
         if msg.topic == "external_interface":
@@ -230,7 +233,7 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
             try:
                 cmd = json.loads(command).get("command")
                 data = json.loads(command).get("data")
-                print("MQTT: Command -", cmd)
+                print(mqtt_debug_string, "Command -", cmd)
 
                 try:
                     data = json.loads(json.loads(command).get("data"))
@@ -253,7 +256,8 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
                 elif cmd == CommandType.AnnounceOnline.name:
                     blackbox_status = True
 
-                    blackbox_new_command(CommandType.NodeElementList, send=True)
+                    blackbox_new_command(
+                        CommandType.NodeElementList, send=True)
                     print("BlackBox is Online.")
 
                 elif cmd == CommandType.NodeOnline.name:
@@ -273,7 +277,7 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
             print("With Message:", msg.payload)
 
     def on_subscribe(client, userdata, mid, granted_qos):
-        #print("MQTT: Subscribe successfull")
+        #print(mqtt_debug_string, "Subscribe successfull")
         blackbox_new_command(CommandType.NodeElementList, send=True)
 
     client = mqtt.Client(client_id=settings.username)
@@ -283,14 +287,15 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
     client.on_disconnect = on_disconnect
 
     def connect_mqtt():
-        print("MQTT: Connecting to", settings.ip)
+        print(mqtt_debug_string, "Connecting to", settings.ip)
         try:
             client.username_pw_set(username=settings.username,
                                    password=settings.password)
             client.will_set(topic=main_topic+"/"+settings.username,
-                            payload=blackbox_new_command(CommandType.AnnounceOffline),
+                            payload=blackbox_new_command(
+                                CommandType.AnnounceOffline),
                             qos=1)
-            #print("MQTT: Skipping connection...")
+            #print(mqtt_debug_string, "Skipping connection...")
 
             if DEBUG:
                 client.tls_set(ca_certs="/etc/mosquitto/ca.crt")
@@ -301,7 +306,7 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
             #client.connect_async(host=settings.ip, port=settings.port, keepalive=30)
             client.loop_start()
         except Exception as e:
-            print("MQTT:", e)
+            print(mqtt_debug_string, e)
 
     connect_mqtt()
 
