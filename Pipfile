@@ -9,12 +9,12 @@ pylint = "*"
 rope = "*"
 
 [packages]
-django = "*"
-paho-mqtt = "*"
-psycopg2-binary = "*"
-daphne = "*"
-channels = "*"
-channels-redis = "*"
+django = "~=2.2"
+paho-mqtt = "~=1.4"
+psycopg2-binary = "~=2.8"
+daphne = "~=2.3"
+channels = "~=2.2"
+channels-redis = "~=2.4"
 
 [requires]
 python_version = "3.7"
