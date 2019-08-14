@@ -51,9 +51,7 @@ class WSType(Enum):
 #     payload = {"type": ws_type.value, "command": command.name, "data": data}
 #     return payload
 
-
-print(mqtt_debug_string, "Initializing MQTT Client sub-system...")
-
+client = None
 node_element_list = None
 unregistered_nodes_list = []
 discovery_mode = False
@@ -61,6 +59,9 @@ blackbox_status = False
 
 mqtt_config_db_table_name = "project01_mqttconfig"
 if mqtt_config_db_table_name in connection.introspection.table_names():
+
+    print(mqtt_debug_string, "Initializing MQTT Client sub-system...")
+
     # Fetch client config from database
     settings = MQTTConfig.objects.all()
 
@@ -218,15 +219,19 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
         client.subscribe(main_topic, qos=1)
 
     def on_disconnect(client, userdata, rc):
+        global discovery_mode, blackbox_status
+
         if rc != 0:
             print(mqtt_debug_string, "Failed to connect to broker. rc =", rc)
         else:
             print(mqtt_debug_string, "Client Disconnect.")
 
+        discovery_mode = False
+        blackbox_status = False
+
     def on_message(client, userdata, msg):
         if msg.topic == "external_interface":
-            global discovery_mode
-            global blackbox_status
+            global discovery_mode, blackbox_status
 
             command = str(msg.payload.decode("utf-8")).replace('\\', '', 0)
 
@@ -280,14 +285,19 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
         #print(mqtt_debug_string, "Subscribe successfull")
         blackbox_new_command(CommandType.NodeElementList, send=True)
 
-    client = mqtt.Client(client_id=settings.username)
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.on_subscribe = on_subscribe
-    client.on_disconnect = on_disconnect
+
 
     def connect_mqtt():
+        global client
+        client = mqtt.Client(client_id=settings.username)
+
+        client.on_connect = on_connect
+        client.on_message = on_message
+        client.on_subscribe = on_subscribe
+        client.on_disconnect = on_disconnect
+
         print(mqtt_debug_string, "Connecting to", settings.ip)
+
         try:
             client.username_pw_set(username=settings.username,
                                    password=settings.password)
@@ -295,7 +305,6 @@ if mqtt_config_db_table_name in connection.introspection.table_names():
                             payload=blackbox_new_command(
                                 CommandType.AnnounceOffline),
                             qos=1)
-            #print(mqtt_debug_string, "Skipping connection...")
 
             if DEBUG:
                 client.tls_set(ca_certs="/etc/mosquitto/ca.crt")
