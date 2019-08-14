@@ -17,17 +17,14 @@ from project01.system_scripts import mqtt_connection
 def index(request):
     template = 'index.html'
 
-    print("BLACKBOX STATUS: ")
-    print(mqtt_connection.blackbox_status)
-
-    return render(request, template, {'title': 'LSOC - Dashboard', 'blackbox_state': mqtt_connection.blackbox_status})
+    return render(request, template, {'title': 'LSOC - Dashboard'})
 
 
 @login_required(redirect_field_name='', login_url='login/')
 def settings(request):
     template = 'settings.html'
 
-    return render(request, template, {'title': 'LSOC - Settings', 'blackbox_state': mqtt_connection.blackbox_status})
+    return render(request, template, {'title': 'LSOC - Settings'})
 
 
 @permission_required('superuser')
@@ -37,8 +34,7 @@ def account_management(request):
 
     return render(request, template, {
         'title': 'LSOC - Account Management',
-        'users': User.objects.all(),
-        'blackbox_state': mqtt_connection.blackbox_status
+        'users': User.objects.all()
     })
 
 
@@ -50,8 +46,7 @@ def account_designer(request):
         return render(request, template, {
             'title': 'LSOC - Account Designer',
             'form': AccoutManagementForm,
-            'node_element_list': mqtt_connection.node_element_list,
-            'blackbox_state': mqtt_connection.blackbox_status
+            'node_element_list': mqtt_connection.node_element_list
         })
     elif request.method == 'POST':
         form = AccoutManagementForm(request.POST)
@@ -73,7 +68,7 @@ def account_designer(request):
 
             return redirect(to='account_management')
         else:
-            return render(request, template, {'form': form, 'blackbox_state': mqtt_connection.blackbox_status})
+            return render(request, template, {'form': form})
 
 
 @permission_required('superuser')
@@ -88,12 +83,11 @@ def connectivity_settings(request):
         'password': mqtt_connection.settings.password
     })
 
-
     return render(request, template, {
         'title': 'LSOC - Connectivity',
-        'mqtt_form': form,
-        'blackbox_state': mqtt_connection.blackbox_status
+        'mqtt_form': form
     })
+
 
 @permission_required('superuser')
 def node_registration(request):
@@ -101,8 +95,7 @@ def node_registration(request):
         template = 'staff/node_registration.html'
 
         return render(request, template, {
-            'title': 'LSOC - Node Registration',
-            'blackbox_state': mqtt_connection.blackbox_status
+            'title': 'LSOC - Node Registration'
         })
     elif request.method == 'POST':
         data = json.dumps(request.POST)
@@ -111,14 +104,18 @@ def node_registration(request):
 
         return redirect(to='node_registration')
 
+
 @permission_required('superuser')
 def get_unregistered_list(request):
     print("Django: Sending Unregistered Nodes list.")
     return JsonResponse({"data": mqtt_connection.unregistered_nodes_list})
+
+
 @permission_required('superuser')
 def get_discovery_mode_status(request):
     print("Django: Sending Discovery Mode status.")
     return JsonResponse({"data": mqtt_connection.discovery_mode})
+
 
 @permission_required('superuser')
 def node_control_panel(request):
@@ -126,8 +123,7 @@ def node_control_panel(request):
 
     if request.method == 'GET':
         return render(request, template, {
-            'title': 'LSOC - NCP',
-            'blackbox_state': mqtt_connection.blackbox_status
+            'title': 'LSOC - NCP'
         })
     elif request.method == 'POST':
         data = json.dumps(request.POST)
@@ -135,10 +131,12 @@ def node_control_panel(request):
         mqtt_connection.blackbox_update_node_info(json.loads(data))
         return redirect(to='node_control_panel')
 
+
 @permission_required('superuser')
 def get_node_element_list(request):
     print("Django: Sending Node-Element list.")
     return JsonResponse({"data": mqtt_connection.node_element_list})
+
 
 # POST request handlers
 
@@ -168,7 +166,7 @@ def set_blackbox_discovery(request):
             return mqtt_connection.blackbox_discovery_disable()
         else:
             print("Unknown POST request made to 'set_blackbox_discovery': ", data)
-            return JsonResponse({"data":"unknown_cmd"})
+            return JsonResponse({"data": "unknown_cmd"})
 
 
 @permission_required('superuser')
