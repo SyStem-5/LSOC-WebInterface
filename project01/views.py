@@ -72,9 +72,9 @@ def account_designer(request):
 
 
 @permission_required('superuser')
-def connectivity_settings(request):
+def system_configuration(request):
     # if request.method == 'GET':
-    template = 'staff/connectivity_settings.html'
+    template = 'staff/system_configuration.html'
 
     form = MQTTConfigurationForm({
         'ip': mqtt_connection.settings.ip,
@@ -84,7 +84,7 @@ def connectivity_settings(request):
     })
 
     return render(request, template, {
-        'title': 'LSOC - Connectivity',
+        'title': 'LSOC - System Configuration',
         'mqtt_form': form
     })
 
@@ -153,7 +153,7 @@ def mqtt_settings_update(request):
             # connection threads so we should try to reconnect now
             mqtt_connection.connect_mqtt()
 
-        return redirect(to='connectivity_settings')
+        return redirect(to='system_configuration')
 
 
 @permission_required('superuser')

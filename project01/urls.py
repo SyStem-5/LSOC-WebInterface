@@ -24,21 +24,21 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('settings/', views.settings, name='settings'),
 
-    path('staff/account', views.account_management, name='account_management'),
-    path('staff/account/designer', views.account_designer, name='account_management_designer'),
-    path('staff/connectivity', views.connectivity_settings, name='connectivity_settings'),
+    path('staff/accounts', views.account_management, name='account_management'),
+    path('staff/accounts/designer', views.account_designer, name='account_management_designer'),
+    path('staff/sysconfig', views.system_configuration, name='system_configuration'),
 
-    path('staff/connectivity/nodes/registration', views.node_registration, name='node_registration'),
-    path('staff/connectivity/nodes/registration/get/discovery_status', views.get_discovery_mode_status, name='get_discovery_mode_status'),
-    path('staff/connectivity/nodes/registration/get/unregistered_list', views.get_unregistered_list, name='get_unregistered_list'),
+    path('staff/sysconfig/nodes/registration', views.node_registration, name='node_registration'),
+    path('staff/sysconfig/nodes/registration/get/discovery_status', views.get_discovery_mode_status, name='get_discovery_mode_status'),
+    path('staff/sysconfig/nodes/registration/get/unregistered_list', views.get_unregistered_list, name='get_unregistered_list'),
 
-    path('staff/connectivity/nodes/CP', views.node_control_panel, name='node_control_panel'),
-    path('staff/connectivity/nodes/CP/get/node_element_list', views.get_node_element_list, name='get_node_element_list'),
+    path('staff/sysconfig/nodes/CP', views.node_control_panel, name='node_control_panel'),
+    path('staff/sysconfig/nodes/CP/get/node_element_list', views.get_node_element_list, name='get_node_element_list'),
 
     #POST Request views
-    path('staff/connectivity/mqtt_settings_update', views.mqtt_settings_update, name='mqtt_settings_update'),
-    path('staff/connectivity/node/registration/discovery', views.set_blackbox_discovery, name='set_blackbox_discovery'),
-    path('staff/connectivity/nodes/CP/post/send_node_command', views.send_node_command, name='send_node_command'),
+    path('staff/sysconfig/mqtt_settings_update', views.mqtt_settings_update, name='mqtt_settings_update'),
+    path('staff/sysconfig/node/registration/discovery', views.set_blackbox_discovery, name='set_blackbox_discovery'),
+    path('staff/sysconfig/nodes/CP/post/send_node_command', views.send_node_command, name='send_node_command'),
 
     path('login/',
          django.contrib.auth.views.LoginView.as_view(template_name = 'auth/login.html',
