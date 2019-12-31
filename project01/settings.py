@@ -38,6 +38,7 @@ if use_secrets:
 # If we're using secrets, we are in production, debugging is off
 DEBUG = not use_secrets
 
+#'192.168.0.107', '127.0.0.1'
 ALLOWED_HOSTS = []
 if use_secrets:
     # Allowed hosts are listed in the filter_host middleware

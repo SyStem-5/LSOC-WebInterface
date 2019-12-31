@@ -2,97 +2,271 @@
 
 {% block content %}
 
-{% load static %}
-
-<div class="row">
-    <div class="form-group col-md-12">
-        <h2>MQTT Settings</h2>
+<div class="container">
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark mb-0">System Configuration</h3>
     </div>
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card text-dark shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="icon ion-network"></i>&nbsp;Network Status</h4>
+                    <p class="card-text">
+
+                        <div class="row clearfix">
+                            <div class="col-sm-12 column">
+                                <div class="card">
+                                    <div id="status-header" class="card-header text-white bg-info">
+                                            <div class="card-title">
+                                                <h3 id="status-header-text">Waiting for data...</h3>
+                                                <small id="status-header-refreshlabel" class="float-right"></small>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-12 column">
+                                        <div id="list-component" class="list-group">
+
+                                            <div class="list-group-item">
+                                                <h4 class="list-group-item-heading">
+                                                    MQTT backhaul
+                                                    <a href="javascript:void(0);" data-toggle="tooltip" data-placement="bottom" title="Network that components use to communicate.">
+                                                        <i class="fa fa-cog" data-toggle="modal" data-target="#modal-mqtt-configuration"></i>
+                                                    </a>
+                                                </h4>
+                                                <p class="list-group-item-text"><span id="component-mqtt" class="badge badge-info">...</span></p>
+                                            </div>
+
+                                            <div class="list-group-item">
+                                                <h4 class="list-group-item-heading">
+                                                    BlackBox
+                                                    <a href="javascript:void(0);" data-toggle="tooltip" data-placement="bottom" title="Component responsible for managing nodes.">
+                                                        <i class="fa fa-question-circle"></i>
+                                                    </a>
+                                                </h4>
+                                                <p class="list-group-item-text"><span id="component-blackbox" class="badge badge-info">...</span></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-dark mb-3">
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fas fa-registered"></i>&nbsp;Node Registration</h4>
+                    <p class="text-center card-text">Add a node to the network.</p>
+                    <button class="btn btn-outline-success btn-block" id="load-node_registration" type="button">Registration</button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fas fa-cog"></i>&nbsp;Node Control Panel (NCP)</h4>
+                    <p class="text-center card-text">Edit, unregister or restart nodes.</p>
+                    <button class="btn btn-outline-success btn-block" id="load-node_control_panel" type="button">NCP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-dark mb-3">
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fas fa-vector-square"></i>&nbsp;Zone Management</h4>
+                    <p class="text-center card-text">Add, remove or edit zones.</p>
+                    <button class="btn btn-outline-success btn-block" id="load-zone_management" type="button">Zones</button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fas fa-users-cog"></i>&nbsp;Account Management</h4>
+                    <p class="text-center card-text">Add or remove users, edit user permissions.</p>
+                    <button class="btn btn-outline-primary btn-block" id="load-account_management" type="button">Accounts</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-dark mb-3">
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <i class="fas fa-cloud-download-alt"></i> 
+                        Updates
+                        <button id="btn-update-refresh" class="btn btn-link float-right" type="button" title="Check for updates">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </h4>
+                    <div style="padding: 5px;"></div>
+                    <h5>
+                        <strong>Status</strong>
+                    </h5>
+                    <em id="label-update-status" class="d-flex d-flex justify-content-center">Idle</em>
+                    <div style="padding: 10px;"></div>
+                    <button
+                        id="btn-update-changelog-install"
+                        class="btn btn-outline-danger btn-block justify-content-center justify-content-center align-items-center"
+                        type="button" data-toggle="modal" data-target="#modal-update-changelog" style="display: none;">Show Changelog &amp; Install</button>
+                    <a id="btn-update-log" class="card-link float-right" href="javascript:void(0)"
+                        data-toggle="modal" data-target="#modal-update-log" style="display: none;">Show log</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fas fa-database"></i>&nbsp;Database Management</h4>
+                    <p class="text-center card-text">Edit the Web Interface database.</p><a class="btn btn-outline-secondary btn-block" role="button" href="/admin/">Database</a>
+                    <p class="text-center text-warning card-text">It is not recommended to edit anything manually.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-dark mb-3">
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fa fa-support"></i> Support</h4>
+                    <div role="alert" class="alert alert-success d-inline-flex">
+                        <span><strong>WAN IP:</strong></span>
+                        <code id="label-wanip" class="text-nowrap text-dark align-items-center"
+                            style="margin-left: 5px; display: flex"></code>
+                    </div>
+                    <button id="btn-wanip-toggle" class="btn float-right" type="button"><i class="far fa-eye"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow bg-white">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fa fa-server"></i> System</h4>
+                    <div class="d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center">
+                        <div role="group" class="btn-group bg-dark border rounded border-dark shadow">
+                            <button id="system_mng-reboot" class="btn btn-info" type="button" style="margin-right: 5px;">Reboot</button>
+                            <button id="system_mng-shutdown" class="btn btn-info" type="button">Shutdown</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-5"></div>
 </div>
 
-<form action="{% url 'mqtt_settings_update' %}" method="post" style="max-width: 500px; margin-left: 10px;">
-    {% csrf_token %}
-    <div class="row" style="min-width: 100px;">
-        <div class="col">
-            <label for="id_ip">IP</label>
-            {{ mqtt_form.ip }}
-            <!-- <input class="form-control" type="text" id="id_ip" name="_ip" value={{mqtt_config.ip}} /> -->
-        </div>
-
-        <div class="col">
-            <label for="id_port">Port</label>
-            {{ mqtt_form.port }}
-            <!-- <input class="form-control" type="number" max="65535" id="id_port" name="_port" value={{mqtt_config.port}} /> -->
-        </div>
-    </div>
-
-    <div class="row" style="min-width: 100px; margin-top: 10px;">
-        <div class="col">
-            <label for="id_username">Username</label>
-            {{ mqtt_form.username }}
-            <!-- <input class="form-control" type="text" id="id_username" name="_user" value={{mqtt_config.username}} /> -->
-        </div>
-
-        <div class="col">
-            <label for="id_password">Password</label>
-            {{ mqtt_form.password }}
-            <!-- <input class="form-control" type="text" id="id_password" name="_pass" value={{mqtt_config.password}} /> -->
-        </div>
-    </div>
-
-    <div class="row" style="margin-left: 0px; margin-top: 10px;">
-        <button type="submit" class="btn btn-outline-primary">Apply</button>
-    </div>
-</form>
-<hr>
-
-<div class="row">
-    <div class="form-group col-md-12">
-        <h2>Nodes</h2>
-    </div>
-</div>
-
-<button type="button" class="btn btn-outline-secondary" onclick="nodeRegistration();">Node Registration</button>
-<button type="button" class="btn btn-outline-secondary" onclick="nodeControlPanel();">Node Control Panel</button>
-
-<hr>
-
-<div class="row">
-    <div class="form-group col-md-12">
-        <h2>System</h2>
-    </div>
-</div>
-
-<hr>
-
-<script>
-    function nodeRegistration() {
-        location.href = "{% url 'node_registration' %}";
-    }
-    function nodeControlPanel() {
-        location.href = "{% url 'node_control_panel' %}"
-    }
-</script>
-
-<!-- Modal -->
-<!-- <div class="modal fade" id="confirm_modal" tabindex="-1" role="dialog" aria-labelledby="confirmModalCenterTitle"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<div id="modal-mqtt-configuration" role="dialog" tabindex="-1" class="modal fade">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalCenterTitle">Confirm</h5>
+                <h4 class="modal-title">MQTT Connection Configuration</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure you want to edit 
+                <form action="/staff/system_configuration/mqtt_configuration" method="post">
+                    {% csrf_token %}
+                    <div class="row" style="min-width: 100px;">
+                        <div class="col">
+                            <label for="id_ip">IP/Domain</label>
+                            {{ mqtt_form.ip }}
+                        </div>
+
+                        <div class="col">
+                            <label for="id_port">Port</label>
+                            {{ mqtt_form.port }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="min-width: 100px; margin-top: 10px;">
+                        <div class="col">
+                            <label for="id_username">Username</label>
+                            {{ mqtt_form.username }}
+                        </div>
+
+                        <div class="col">
+                            <label for="id_password">Password</label>
+                            {{ mqtt_form.password }}
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-left: 0px; margin-top: 10px;">
+                        <button id="mqtt-config-submit" type="submit" hidden/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline-success" type="button" onclick="$('#mqtt-config-submit').click()">Save & Reconnect</button></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-component-log" role="dialog" tabindex="-1" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="component-log-title" class="modal-title"></h4>
+                <button id="component-log-refreshbtn" class="btn" onclick="requestComponentLog($(this))">
+                    <i class="fa fa-refresh"></i>
+                </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="component-log-text" style="width: 100%; height: 50vh; font-size: smaller;" readonly></textarea>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-update-changelog" role="dialog" tabindex="-1" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">System Update - Changelog</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="update-changelog-text" style="width: 100%; height: 50vh; font-size: smaller;" readonly></textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button id="btn-update-dl_install"class="btn btn-primary" type="button">Download and Install</button>
             </div>
         </div>
     </div>
-</div> -->
+</div>
+
+<div id="modal-update-log" role="dialog" tabindex="-1" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">System Update - Log</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+            <div class="modal-body">
+                <textarea id="update-log-text" style="width: 100%; height: 50vh; font-size: smaller;" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script defer src="/static/assets/js/bootstrap-notify.min.js"></script>
+<script defer src="/static/assets/js/system-configuration/notification.js"></script>
+<script defer src="/static/assets/js/system-configuration/sys_config_base.js"></script>
+
 {% endblock %}
