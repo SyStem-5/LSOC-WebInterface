@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="mb-4">
+        <h3 class="text-dark mb-0">Dashboard</h3>
+    </div>
+
+    <div id="row-tiles" class="row" style="margin-bottom: 30px">
+        <!-- <div class="col">
+            <img class="img-fluid border rounded border-light shadow" src="static/assets/img/template_floor_plan_1.jpg">
+        </div> -->
+    </div>
+</div>
+
+<script defer src="/static/assets/js/bootstrap-notify.min.js"></script>
+<script defer src="/static/assets/js/system-configuration/notification.js"></script>
+<script defer src="/static/assets/js/dashboard/tile_generation.js"></script>
+<script defer src="/static/assets/js/dashboard/tile-setdata.js"></script>
+<script defer src="/static/assets/js/dashboard/base.js"></script>
+
+{% endblock %}

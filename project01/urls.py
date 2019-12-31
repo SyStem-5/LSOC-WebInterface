@@ -20,25 +20,25 @@ from django.urls import path
 from project01 import views
 from project01 import forms
 
+
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.dashboard, name='dashboard'),
     path('settings/', views.settings, name='settings'),
 
-    path('staff/accounts', views.account_management, name='account_management'),
-    path('staff/accounts/designer', views.account_designer, name='account_management_designer'),
-    path('staff/sysconfig', views.system_configuration, name='system_configuration'),
+    path('staff/system_configuration', views.system_configuration, name='system_configuration'),
 
-    path('staff/sysconfig/nodes/registration', views.node_registration, name='node_registration'),
-    path('staff/sysconfig/nodes/registration/get/discovery_status', views.get_discovery_mode_status, name='get_discovery_mode_status'),
-    path('staff/sysconfig/nodes/registration/get/unregistered_list', views.get_unregistered_list, name='get_unregistered_list'),
+    path('staff/system_configuration/accounts', views.account_management, name='account_management'),
 
-    path('staff/sysconfig/nodes/CP', views.node_control_panel, name='node_control_panel'),
-    path('staff/sysconfig/nodes/CP/get/node_element_list', views.get_node_element_list, name='get_node_element_list'),
+    path('staff/system_configuration/nodes/registration', views.node_registration, name='node_registration'),
+
+    path('staff/system_configuration/nodes/CP', views.node_control_panel, name='node_control_panel'),
+
+    path('staff/system_configuration/zones', views.zones, name='zones'),
+
+    path('staff/system_configuration/nodes/registration/mqtt-cert', views.mqtt_cert, name='node_registration_mqtt_cert'),
 
     #POST Request views
-    path('staff/sysconfig/mqtt_settings_update', views.mqtt_settings_update, name='mqtt_settings_update'),
-    path('staff/sysconfig/node/registration/discovery', views.set_blackbox_discovery, name='set_blackbox_discovery'),
-    path('staff/sysconfig/nodes/CP/post/send_node_command', views.send_node_command, name='send_node_command'),
+    path('staff/system_configuration/mqtt_configuration', views.mqtt_configuration),
 
     path('login/',
          django.contrib.auth.views.LoginView.as_view(template_name = 'auth/login.html',

@@ -1,8 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django.utils.translation import ugettext_lazy
 
 from django.contrib.auth.models import User
+from project01.models import LSOCProfile
 
 
 class BootstrapAuthenticationForm(AuthenticationForm):
@@ -24,6 +25,10 @@ class AccoutManagementForm(UserCreationForm):
                                widget=forms.TextInput({
                                    'class': 'form-control',
                                    'placeholder': 'User name'}))
+    email = forms.CharField(max_length=254,
+                               widget=forms.EmailInput({
+                                   'class': 'form-control',
+                                   'placeholder': 'E-mail address'}))
     password1 = forms.CharField(label=ugettext_lazy("Password"),
                                widget=forms.PasswordInput({
                                    'class': 'form-control',
@@ -34,7 +39,9 @@ class AccoutManagementForm(UserCreationForm):
                                    'placeholder': 'Confirm Password'}))
     lsoc_permissions = forms.CharField(widget=forms.TextInput({
                                       'class': 'form-control',
-                                      'placeholder': '*'}))
+                                      'value': '{}',
+                                      'readonly':'readonly'
+                                      }))
     description = forms.CharField(max_length=100,
                                   widget=forms.TextInput({
                                       'class': 'form-control',
@@ -42,14 +49,28 @@ class AccoutManagementForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2', 'lsoc_permissions', 'description',)
+        fields = ('username', 'email', 'password1', 'password2', 'lsoc_permissions', 'description',)
 
+class AccountEditForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = (
+            'email',
+        )
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = LSOCProfile
+        fields = (
+            'lsoc_permissions',
+            'description'
+        )
 
 class MQTTConfigurationForm(forms.Form):
 
     #ip = forms.GenericIPAddressField(widget=forms.TextInput({
     #    'class': 'form-control',
-    #    'type': 'text',  
+    #    'type': 'text',
     #}))
 
     ip = forms.CharField(max_length=500, required=True,

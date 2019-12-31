@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div>
+        <h3 class="text-dark mb-0">Zone Management</h3>
+    </div>
+    <div style="margin: 50px;"></div>
+    <div class="table-responsive bg-white border rounded shadow">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th class="text-uppercase bg-light border rounded-0">Zone Name</th>
+                    <th class="bg-light" style="width: 10px;">
+                        <button id="btn-add-row" class="btn btn-sm btn-outline-primary" type="button">
+                            Add New
+                        </button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+    <div class="mb-5"></div>
+</div>
+
+<script defer src="/static/assets/js/bootstrap-notify.min.js"></script>
+<script defer src="/static/assets/js/system-configuration/notification.js"></script>
+<script defer src="/static/assets/js/system-configuration/zones/base.js"></script>
+
+{% endblock %}

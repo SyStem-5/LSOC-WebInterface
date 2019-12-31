@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export DJANGO_ALLOW_ASYNC_UNSAFE="true"
 export SECRETS_LOCATION="/run/secrets"
 export SECRET_KEY="mehsecretkey_bleh"
 export REDIS_HOST="127.0.0.1"

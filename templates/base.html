@@ -3,455 +3,147 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }}</title>
-
-    {% load staticfiles %}
-
-    <script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
-
-    <script src="{% static 'assets/js/popper.min.js' %}"></script>
-
-    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
-
-    <script src="{% static 'assets/js/js-cookie.js' %}"></script>
-
-    <script src="{% static 'assets/js/theme_settings.js' %}"></script>
-
-    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
-
-    <link rel="stylesheet" href="{% static 'assets/css/fa_all.css' %}">
-
-    <link rel="stylesheet" href="{% static 'assets/css/custom-scrollbar/jquery.mCustomScrollbar.min.css' %}">
-
-    <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/custom-themes.css' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'assets/img/favicon.png' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Large Scale Overwatch and Control - {{ title }}</title>
+    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+    <link rel="stylesheet" href="/static/assets/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="/static/assets/css/styles.min.css">
 </head>
 
-<body>
-    <!-- <div class="background-image"></div> -->
-    <div class="page-wrapper toggled">
-        <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
-            <i class="fas fa-bars"></i>
-        </a>
-        <nav id="sidebar" class="sidebar-wrapper">
-            <div class="sidebar-content">
-                <div class="sidebar-brand">
-                    <a>LSOC</a>
-                    <div id="close-sidebar">
-                        <i class="fas fa-times"></i>
-                    </div>
-                </div>
-                <!--<div class="sidebar-header">
-                    <div class="user-pic">
-                        <img class="img-responsive img-rounded" src="{% static 'assets/img/user.jpg' %}" alt="User picture">
-                    </div>
-                    <div class="user-info">
-                        <span class="user-name">
-                            <strong>{{ user.get_username }}</strong>
-                        </span>
-                        {% if user.is_staff %}
-                        <span class="user-role">Administrator</span>
-                        {% endif %}
-                        <span class="user-status">
-                            <i class="fa fa-circle"></i>
-                            <span>Online</span>
-                        </span>
-                    </div>
-                </div>-->
-                <!-- sidebar-header  -->
-
-                <!--
-                <div class="sidebar-search">
-                    <div>
-                        <div class="input-group">
-                            <input type="text" class="form-control search-menu" placeholder="Search...">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    <i class="fa fa-search" aria-hidden="true"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
-                <!-- sidebar-search  -->
-
-                <div class="sidebar-menu">
-                    <ul>
-                        <li class="header-menu">
-                            <span>General</span>
-                        </li>
-                        <!--<li class="sidebar-dropdown">
-                            <a href="#">
-                                <i class="fa fa-tachometer-alt"></i>
-                                <span>Dashboard</span>
-                                <span class="badge badge-pill badge-danger">New</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li>
-                                        <a href="#">Dashboard 1
-                                            <span class="badge badge-pill badge-success">Pro</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Dashboard 2</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Dashboard 3</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="sidebar-dropdown">
-                            <a href="#">
-                                <i class="fa fa-shopping-cart"></i>
-                                <span>E-commerce</span>
-                                <span class="badge badge-pill badge-primary">3</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li>
-                                        <a href="#">Products
-
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Orders</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Credit cart</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="sidebar-dropdown">
-                            <a href="#">
-                                <i class="far fa-gem"></i>
-                                <span>Components</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li>
-                                        <a href="#">General</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Panels</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Tables</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Icons</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Forms</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="sidebar-dropdown">
-                            <a href="#">
-                                <i class="fa fa-chart-line"></i>
-                                <span>Charts</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li>
-                                        <a href="#">Pie chart</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Line chart</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Bar chart</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Histogram</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="sidebar-dropdown">
-                            <a href="#">
-                                <i class="fa fa-globe"></i>
-                                <span>Maps</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li>
-                                        <a href="#">Google maps</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Open street map</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="header-menu">
-                            <span>Extra</span>
-                        </li>-->
-                        <li>
-                            <a href={% url 'index' %}>
-                                <i class="fa fa-tachometer-alt"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <!--<li>
-                            <a href="#">
-                                <i class="fa fa-folder"></i>
-                                <span>Examples</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-book"></i>
-                                <span>Documentation</span>
-                            </a>
-                        </li>-->
-                    </ul>
-                </div>
-                <!-- sidebar-menu  -->
-            </div>
-            <!-- sidebar-content  -->
-            <div class="sidebar-footer">
-
-                <!-- <div>
-                    {% if user.is_staff %}
-                    <a style="width: 10px;" href="#" onclick="conn_settings();">SYSTEM</a>
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar navbar-light navbar-expand-md shadow-lg align-items-center sidebar sidebar-dark accordion bg-gradient-primary p-0 sticky-top"
+            style="height: 100%">
+            <div class="container-fluid d-flex flex-column p-0"><button class="btn btn-primary rounded-circle border-0"
+                    id="sidebarToggle" type="button" style="margin-top: 20px;"></button>
+                <hr class="sidebar-divider my-0">
+                <ul class="nav navbar-nav text-light d-lg-flex">
+                    <li id="accordionSidebar" role="presentation" class="nav-item">
+                        <a class="nav-link active" href="/" id="load-dashboard">
+                            <i class="icon-grid"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    {% if user.is_superuser %}
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link border-danger" id="load-system_config">
+                            <i class="icon-settings"></i>
+                            <span>System Configuration</span>
+                        </a>
+                    </li>
                     {% endif %}
-
-                    {% if blackbox_state %}
-                    <i class="fas fa-check-circle" style="color: azure;"></i>
-                    {% else %}
-                    <i class="fas fa-minus-circle" style="color: azure;"></i>
-                    {% endif %}
-                </div> -->
-                <!--<div class="dropdown">
-
-                    <a href="#" class="" id="dropdownMenuNotification" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
-                        <i class="fa fa-bell"></i>
-                        <span class="badge badge-pill badge-warning notification">3</span>
-                    </a>
-                    <div class="dropdown-menu notifications" aria-labelledby="dropdownMenuMessage">
-                        <div class="notifications-header">
-                            <i class="fa fa-bell"></i>
-                            Notifications
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-                            <div class="notification-content">
-                                <div class="icon">
-                                    <i class="fas fa-check text-success border border-success"></i>
-                                </div>
-                                <div class="content">
-                                    <div class="notification-detail">Lorem ipsum dolor sit amet consectetur adipisicing
-                                        elit. In totam explicabo</div>
-                                    <div class="notification-time">
-                                        6 minutes ago
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <div class="notification-content">
-                                <div class="icon">
-                                    <i class="fas fa-exclamation text-info border border-info"></i>
-                                </div>
-                                <div class="content">
-                                    <div class="notification-detail">Lorem ipsum dolor sit amet consectetur adipisicing
-                                        elit. In totam explicabo</div>
-                                    <div class="notification-time">
-                                        Today
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <div class="notification-content">
-                                <div class="icon">
-                                    <i class="fas fa-exclamation-triangle text-warning border border-warning"></i>
-                                </div>
-                                <div class="content">
-                                    <div class="notification-detail">Lorem ipsum dolor sit amet consectetur adipisicing
-                                        elit. In totam explicabo</div>
-                                    <div class="notification-time">
-                                        Yesterday
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-center" href="#">View all notifications</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <a href="#" class="" id="dropdownMenuMessage" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
-                        <i class="fa fa-envelope"></i>
-                        <span class="badge badge-pill badge-success notification">7</span>
-                    </a>
-                    <div class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage">
-                        <div class="messages-header">
-                            <i class="fa fa-envelope"></i>
-                            Messages
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-                            <div class="message-content">
-                                <div class="pic">
-                                    <img src="{% static 'assets/img/user.jpg' %}" alt="">
-                                </div>
-                                <div class="content">
-                                    <div class="message-title">
-                                        <strong> Jhon doe</strong>
-                                    </div>
-                                    <div class="message-detail">Lorem ipsum dolor sit amet consectetur adipisicing
-                                        elit. In totam explicabo</div>
-                                </div>
-                            </div>
-
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <div class="message-content">
-                                <div class="pic">
-                                    <img src="{% static 'assets/img/user.jpg' %}" alt="">
-                                </div>
-                                <div class="content">
-                                    <div class="message-title">
-                                        <strong> Jhon doe</strong>
-                                    </div>
-                                    <div class="message-detail">Lorem ipsum dolor sit amet consectetur adipisicing
-                                        elit. In totam explicabo</div>
-                                </div>
-                            </div>
-
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <div class="message-content">
-                                <div class="pic">
-                                    <img src="{% static 'assets/img/user.jpg' %}" alt="">
-                                </div>
-                                <div class="content">
-                                    <div class="message-title">
-                                        <strong> Jhon doe</strong>
-                                    </div>
-                                    <div class="message-detail">Lorem ipsum dolor sit amet consectetur adipisicing
-                                        elit. In totam explicabo</div>
-                                </div>
-                            </div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-center" href="#">View all messages</a>
-
-                    </div>
-                </div>-->
-                <div class="dropdown">
-                    <a href="#" id="dropdownMenuMessage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-cog"></i>
-                        <!-- <span class="badge-sonar" hidden></span> -->
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuMessage">
-                        {% if user.is_staff %}
-                        <a class="dropdown-item" href="#" onclick="acc_manage();">Account Management</a>
-                        <a class="dropdown-item" href="/admin/">Database Management</a>
-                        <a class="dropdown-item" href="#" style="border-bottom:#80808029 solid 1px;" onclick="conn_settings();">System Configuration</a>
-                        {% endif %}
-                        <a class="dropdown-item" href="#" onclick="settings();">Preferences</a>
-                    </div>
-                </div>
-                <div>
-                    <a data-toggle="modal" data-target="#modalLogoutConfirm" name="logout">
-                        <i class="fa fa-power-off"></i>
-                    </a>
-                </div>
+                </ul>
+                <div class="text-center d-none d-md-inline"></div>
             </div>
         </nav>
-        <!-- sidebar-wrapper  -->
-        <main class="page-content">
-            <div class="container-fluid">
-                <div class="shadow p-4 mb-4 bg-light rounded">
-                    {% block content %}
-                    {% endblock %}
-                </div>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div class="d-inline" id="content">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid"><button class="btn btn-link rounded-circle mr-3"
+                            id="sidebarToggleOutside" type="button"><i class="fas fa-bars"></i></button>
+                        <ul class="nav navbar-nav flex-nowrap ml-auto">
+                            <li class="nav-item dropdown no-arrow mx-1" role="presentation">
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#">
+                                    <!-- <span class="badge badge-danger badge-counter">3+</span> -->
+                                    <i class="fas fa-bell fa-fw"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in"
+                                    role="menu">
+                                    <h6 class="dropdown-header">alerts center</h6>
+                                    <!-- <a class="d-flex align-items-center dropdown-item" href="#">
+                                        <div class="mr-3">
+                                            <div class="bg-primary icon-circle"><i
+                                                    class="fas fa-file-alt text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 12, 2019</span>
+                                            <p>A new monthly report is ready to download!</p>
+                                        </div>
+                                    </a>
+                                    <a class="d-flex align-items-center dropdown-item" href="#">
+                                        <div class="mr-3">
+                                            <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 7, 2019</span>
+                                            <p>$290.29 has been deposited into your account!</p>
+                                        </div>
+                                    </a>
+                                    <a class="d-flex align-items-center dropdown-item" href="#">
+                                        <div class="mr-3">
+                                            <div class="bg-warning icon-circle"><i
+                                                    class="fas fa-exclamation-triangle text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 2, 2019</span>
+                                            <p>Spending Alert: We've noticed unusually high spending for your account.
+                                            </p>
+                                        </div>
+                                    </a>
+                                    <a class="text-center dropdown-item small text-gray-500" href="#">Show All Alerts</a> -->
+                                    <a class="text-center dropdown-item small text-gray-500">No Notifications</a>
+                                </div>
+                            </li>
+                            </li>
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow" role="presentation">
+                            <li class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link"
+                                    data-toggle="dropdown" aria-expanded="false" href="#"><span
+                                        class="text-capitalize d-none d-lg-inline mr-2 text-gray-600 small"
+                                        id="user_name">{{ user.get_username }}</span><img
+                                        class="border rounded-circle border-white img-profile" id="user_picture_sm"
+                                        src="/static/assets/img/avatars/blank_user_512x512.png"></a>
+                                <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a
+                                        class="dropdown-item" role="presentation" href="#"><i
+                                            class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Profile</a><a
+                                        class="dropdown-item" role="presentation" href="#"><i
+                                            class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Preferences</a>
+                                    <div class="dropdown-divider"></div><a class="dropdown-item" role="presentation"
+                                        id="btn-logout" href="#"><i
+                                            class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a>
+                                </div>
+                            </li>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div id="webpage-container" value="">{% block content %}{% endblock %}</div>
             </div>
-        </main>
-        <div class="modal fade" id="modalLogoutConfirm" tabindex="-1" role="dialog" aria-labelledby="modalLogoutConfirmTitle"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to log out?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-primary" onclick="logout();">Yes</button>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>All rights reserved © 2019 Neutron Systems</span></div>
+                </div>
+            </footer>
+            <div class="modal fade" role="dialog" tabindex="-1" id="modalLogOut">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Log out?</h4><button type="button" class="close"
+                                data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to log out?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" type="button" data-dismiss="modal">
+                                No, take me back
+                            </button>
+                            <button class="btn btn-warning" id="btn-logout-yes" type="submit">Yes</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- page-content" -->
+        <a class="border rounded scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
     </div>
-    <!-- page-wrapper -->
-
-    <script src="{% static 'assets/js/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js' %}"></script>
-    <script src="{% static 'assets/js/sidebar.js' %}"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="/static/assets/js/theme.js"></script>
+    <script src="/static/assets/js/base.js"></script>
 </body>
-
-<script>
-    var default_theme = "ice-theme";
-    $(document).ready(function () {
-        var themeCookie = Cookies.get("theme");
-        if (themeCookie) {
-            setTheme(themeCookie);
-        } else {
-            setTheme(default_theme);
-        }
-
-        var showSidebarBgCookie = Cookies.get("sidebar_show_bg");
-        if (showSidebarBgCookie) {
-            setSidebarBgVisible(showSidebarBgCookie == "true" ? true : false);
-
-            //If its defined and true, set the bg image to whatever's saved
-            if (showSidebarBgCookie == "true") {
-                var sidebarBgCookie = Cookies.get("sidebar_bg");
-
-                if (sidebarBgCookie) {
-                    setBackground(sidebarBgCookie);
-                }
-            }
-        } else {
-            setSidebarBgVisible(false);
-        }
-    });
-
-    function logout() {
-        location.href = "{% url 'logout' %}?next=/";
-    }
-    function settings() {
-        location.href = "{% url 'settings' %}";
-    }
-</script>
-
-{% if user.is_staff %}
-<script>
-    function acc_manage() {
-        location.href = "{% url 'account_management' %}";
-    }
-    function conn_settings() {
-        location.href = "{% url 'system_configuration' %}";
-    }
-</script>
-{% endif %}
-
 </html>

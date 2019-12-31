@@ -21,17 +21,10 @@
                 <input type="submit" value="Log in" class="btn btn-primary btn-block" />
             </div>
             {% if form.errors %}
-            <p class="validation-summary-errors" style="color: red">Wrong Username or Password</p>
+            <p style="margin-left: 15px; color: red;">Wrong Username or Password</p>
             {% endif %}
         </form>
     </div>
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-
-{% load staticfiles %}
-<script src="{% static 'assets/js/jquery.validate.min.js' %}"></script>
 
 {% endblock %}
